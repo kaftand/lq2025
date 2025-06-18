@@ -279,13 +279,17 @@ class EM_boot():
 
         return p_s
 
-    def predict(self, X):
+    def predict_ci(self, X):
         boot_res = []
         for i_boot in range(1000):
             i_thisboot = np.random.choice(X.shape[0], X.shape[0], replace=True)
             boot_res.append(self.predict_boot(X[i_thisboot,:]))
 
-        return np.quantile(boot_res, 0.05) > self.p0
+        return np.quantile(boot_res, 0.025), np.quantile(boot_res, 0.975)
+    def predict(self, X):
+        lb, ub = self.predict_ci(X)
+
+        return (lb > self.p0) or (ub < self.p0)
 
 
 

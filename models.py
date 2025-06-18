@@ -255,12 +255,16 @@ class EM_boot():
         self.X_train = X_Train
 
     def predict_boot(self, X, threshold = 0.00001, maxiter=1000):
-        p_target = np.mean(self.classifier.predict_proba((self.X_train))[:,1])
+        p_target = np.mean(self.classifier.predict_proba((self.X_train))[:,1])#np.mean(self.y_train)#
         delta_p = np.inf
         p_s = p_target
         ps_target = self.classifier.predict_proba(X)[:,1]
         ps_target[ps_target >= 1] = 0.9999
         ps_target[ps_target <= 0] = 0.0001
+        ps_target_proj = project(ps_target, self.p0, p_target)
+        p_s = self.p0#np.mean(ps_target_proj)
+        ps_target = ps_target_proj
+        p_target = self.p0
         it = 0
         while((delta_p > threshold) & (it < maxiter)):
             p_w_x_num = (p_s / p_target) * ps_target
@@ -270,6 +274,8 @@ class EM_boot():
             delta_p = abs( p_s - p_s_p_1)
             p_s = p_s_p_1
             it += 1
+            if it >= maxiter:
+                print(f'reached max iter with delta = {delta_p}')
 
         return p_s
 
@@ -371,7 +377,7 @@ class EM_empircal_lr():
             chi = self.predict_chi(X_sample, X[i_thisboot,:], mdl)
             chi = self.predict_chi(X_sample, X[i_thisboot,:], mdl)
             self.boot_chi.append(chi)
-        self.chi_hat = np.quantile(self.boot_chi, 0.95)*.632  + 0.368 * chi2.ppf(0.95, df=1)
+        self.chi_hat = np.quantile(self.boot_chi, 0.95)#*.632  + 0.368 * chi2.ppf(0.95, df=1)
         print(self.chi_hat)
             
     def predict_chi(self, X, X_train, mdl, threshold = 0.00001, maxiter=10_000):

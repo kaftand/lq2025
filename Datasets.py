@@ -26,9 +26,9 @@ def load_dataset(i_dataset):
     X = df.drop(this_dataset.target_col, axis = 1).values
     return X, y
 
-def simulate_dataset(seed):
-    y = np.concatenate([np.ones(1000), np.zeros(1000)])
-    X = np.concatenate([np.random.normal(loc=0, scale=1, size=(1000,1)),
-                        np.random.normal(loc=0.85, scale=1, size=(1000,1))
+def simulate_dataset(seed, scale = 1, n_per_class = 1000):
+    y = np.concatenate([np.ones(n_per_class), np.zeros(n_per_class)])
+    X = np.concatenate([np.random.normal(loc=0, scale=scale, size=(n_per_class,1)),
+                        np.random.normal(loc=0.85, scale=scale, size=(n_per_class,1))
                         ])
     return X, y
